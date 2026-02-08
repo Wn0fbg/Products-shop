@@ -6,9 +6,7 @@ const router = Router();
 // Get all products
 router.get("/", async (req, res) => {
   try {
-    const products = await pool.query(
-      `SELECT * FROM products ORDER BY created_at DESC`,
-    );
+    const products = await pool.query("SELECT * FROM products");
     console.log("fetched products", products);
     res.status(200).json({ success: true, data: products });
   } catch (err) {
@@ -27,14 +25,14 @@ router.post("/", async (req, res) => {
   }
   try {
     const newProduct = await pool.query(
-      `
-      INSERT INTO products (product_name, price, image) 
-      VALUES (${product_name}, ${price}, ${image}) 
+      `INSERT INTO products (product_name, price, image) 
+      VALUES ($1, $2, $3) 
       RETURNING *
       `,
+      [product_name, price, image || false],
     );
     console.log("new product added: ", newProduct);
-    res.status(201).json({ success: true, data: newProduct[0] });
+    res.json(newProduct.rows[0]);
   } catch (err) {
     console.log("Error in create product", err);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -42,13 +40,16 @@ router.post("/", async (req, res) => {
 });
 
 // Get a product
-router.get("/:product_id", async (req, res) => {
-  const { product_id } = req.params;
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
   try {
     const product = await pool.query(
-      `SELECT * FROM products WHERE product_id=${product_id}`,
+      `SELECT * FROM products WHERE product_id=${id}`,
     );
-    res.status(200).json({ success: true, data: product[0] });
+    res.status(200).json({
+      success: true,
+      data: product.rows[0],
+    });
   } catch (err) {
     console.log("Error in get a product", err);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -56,23 +57,28 @@ router.get("/:product_id", async (req, res) => {
 });
 
 // Update a product
-router.put("/:product_id", async (req, res) => {
-  const { product_id } = req.params;
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
   const { product_name, price, image } = req.body;
 
   try {
-    const updateProduct = await pool.query(
-      `SET 
-         product_name=${product_name}, 
-         price=${price}, 
-         image=${image} 
-      WHERE product_id=${product_id}
-      RETURNING *`,
+    const result = await pool.query(
+      `UPDATE products
+       SET product_name = $1,
+           price = $2,
+           image = $3
+       WHERE product_id = $4
+       RETURNING *`,
+      [product_name, price, image, id],
     );
-    if (updateProduct.length === 0) {
-      res.status(404).json({ success: false, message: "Product not found" });
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
-    res.status(200).json({ success: true, data: updateProduct[0] });
+
+    res.status(200).json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.log("Error in updated product", err);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -80,7 +86,7 @@ router.put("/:product_id", async (req, res) => {
 });
 
 // Delete a product
-router.delete("/:product_id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { product_id } = req.params;
   try {
     const deletedProduct = await pool.query(

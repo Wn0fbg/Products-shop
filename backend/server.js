@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
+app.use(express.json());
 
 app.use("/api/products", productRoutes);
 
