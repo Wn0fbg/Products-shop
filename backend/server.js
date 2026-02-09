@@ -21,4 +21,3 @@ app.listen(PORT, () => {
   console.log("Server is running on port ", PORT);
 });
 
-// npm init -y npm i express dotenv cors helmet morga npm i pg npm i nodemon -D

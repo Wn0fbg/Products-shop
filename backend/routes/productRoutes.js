@@ -87,10 +87,11 @@ router.put("/:id", async (req, res) => {
 
 // Delete a product
 router.delete("/:id", async (req, res) => {
-  const { product_id } = req.params;
+  const { id } = req.params;
   try {
     const deletedProduct = await pool.query(
-      `DELETE FROM products WHERE product_id=${product_id} RETURNING *`,
+      `DELETE FROM products WHERE product_id=$1 RETURNING *`,
+      [id],
     );
 
     if (deletedProduct.length === 0) {
@@ -100,7 +101,7 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true, data: deletedProduct[0] });
+    res.status(200).json({ success: true, data: deletedProduct.rows[0] });
   } catch (err) {
     console.log("Error in deleted product", err);
     res.status(500).json({ success: false, message: "Internal server error" });
