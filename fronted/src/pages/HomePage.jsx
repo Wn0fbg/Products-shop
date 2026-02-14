@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { PlusCircleIcon, RefreshCwIcon } from "lucide-react";
 import { useProductStore } from "../store/useProductStore";
+import { useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
 function HomePage() {
@@ -8,7 +8,7 @@ function HomePage() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
@@ -17,7 +17,7 @@ function HomePage() {
           <PlusCircleIcon className="size-5 mr-2" />
           Add Product
         </button>
-        <button className="btn btn-ghost btn-circle" onClick={fetchProducts}>
+        <button className="btn btn-ghost btn-circle">
           <RefreshCwIcon className="size-5" />
         </button>
       </div>
@@ -26,16 +26,12 @@ function HomePage() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="loading loading-spinner loading-lg" />
-        </div>
-      ) : Array.isArray(products) && products.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          <div className="laoding loading=spinner loading-lg" />
         </div>
       ) : (
-        <div className="text-center text-sm text-gray-500">No products</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <ProductCard />
+        </div>
       )}
     </main>
   );
