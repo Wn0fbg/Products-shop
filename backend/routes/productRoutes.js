@@ -7,8 +7,9 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     const products = await pool.query("SELECT * FROM products");
-    console.log("fetched products", products);
-    res.status(200).json({ success: true, data: products });
+    // console.log("fetched products", products);
+    // res.status(200).json({ success: true, data: products });
+    res.json(products.rows);
   } catch (err) {
     console.log("Error in get products", err);
     res.status(500).json({ success: false, message: "Internal server error" });

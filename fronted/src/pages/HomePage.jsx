@@ -1,14 +1,31 @@
 import { PlusCircleIcon, RefreshCwIcon } from "lucide-react";
-import { useProductStore } from "../store/useProductStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import ProductCard from "../components/ProductCard";
 
 function HomePage() {
-  const { products, loading, error, fetchProducts } = useProductStore();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const getProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await axios.get("http://localhost:3000/products");
+      setProducts(res.data);
+      console.log(res.data);
+    } catch (err) {
+      console.error(err.message);
+      setError("Failed to fetch todos. Please try again later");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    getProducts();
+  }, []);
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
@@ -26,11 +43,13 @@ function HomePage() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="laoding loading=spinner loading-lg" />
+          <div className="loading loading-spinner loading-lg" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          <ProductCard />
+          {products.map((product) => (
+            <ProductCard key={product.product_id} product={product} />
+          ))}
         </div>
       )}
     </main>
