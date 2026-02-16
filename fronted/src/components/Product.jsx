@@ -2,25 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { PackageIcon } from "lucide-react";
 import ProductCard from "../components/ProductCard";
+import { useProductStore } from "../store/useProductStore";
 
 function Product() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const getProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await axios.get("http://localhost:3000/products");
-      setProducts(res.data);
-    } catch (err) {
-      console.error(err.message);
-      setError("Failed to fetch todos. Please try again later");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { products, loading, error, getProducts } = useProductStore();
 
   useEffect(() => {
     getProducts();
