@@ -36,9 +36,9 @@ function AddProductModal() {
                   type="text"
                   placeholder="Enter product name"
                   className="input input-bordered w-full pl-10 py-3 focus:input-primary transition-colors duration-300"
-                  value={formData.name}
+                  value={formData.product_name}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, product_name: e.target.value })
                   }
                 />
               </div>
@@ -97,7 +97,10 @@ function AddProductModal() {
               type="submit"
               className="btn btn-primary min-w-[30]"
               disabled={
-                !formData.name || !formData.price || !formData.image || loading
+                !formData.product_name ||
+                !formData.price ||
+                !formData.image ||
+                loading
               }
             >
               {loading ? (
